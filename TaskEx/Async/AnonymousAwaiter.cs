@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace TwistedOak.Util.TaskEx {
     /// <summary>A custom generic IAwaiter, implemented with delegates passed to the constructor.</summary>
     [DebuggerStepThrough]
-    public class AnonymousAwaiter<T> : IAwaiter<T> {
+    public sealed class AnonymousAwaiter<T> : IAwaiter<T> {
         private readonly Func<bool> _isCompleted;
         private readonly Action<Action> _onCompleted;
         private readonly Func<T> _getResult;
@@ -22,7 +22,7 @@ namespace TwistedOak.Util.TaskEx {
     }
     /// <summary>A custom void IAwaiter, implemented with delegates passed to the constructor.</summary>
     [DebuggerStepThrough]
-    public class AnonymousAwaiter : IAwaiter {
+    public sealed class AnonymousAwaiter : IAwaiter {
         private readonly Func<bool> _isCompleted;
         private readonly Action<Action> _onCompleted;
         private readonly Action _getResult;

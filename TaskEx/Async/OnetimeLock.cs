@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 
 namespace TwistedOak.Util.TaskEx {
-    ///<summary>A thread-safe lock that can only be acquired once and never released.</summary>
+    ///<summary>A thread-safe lock that can be acquired once but never released.</summary>
     public sealed class OnetimeLock {
         private int _state;
         ///<summary>Returns true exactly once, for the first caller. Thread safe.</summary>
