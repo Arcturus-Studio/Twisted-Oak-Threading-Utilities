@@ -35,56 +35,6 @@ public class TaskExTest {
     }
 
     [TestMethod]
-    public void CancellableAwait() {
-        var c = new CancellationTokenSource();
-        c.Cancel();
-        Util.AsyncTest(async () => {
-            Task<bool> tb = Task.FromResult(true);
-            Task t = tb;
-            var cb = tb.CancellableAwait(c.Token);
-            var cu = t.CancellableAwait(c.Token);
-
-            try {
-                await cb; Assert.Fail();
-            } catch (OperationCanceledException) {}
-            try {
-                await cu; Assert.Fail();
-            } catch (OperationCanceledException) {}
-
-            Assert.IsTrue(true == await tb.CancellableAwait(default(CancellationToken)));
-            await t.CancellableAwait(default(CancellationToken));
-
-            var c1 = TaskEx.CancelledTask.CancellableAwait(default(CancellationToken));
-            try {
-                await c1; Assert.Fail();
-            } catch (OperationCanceledException) { }
-            var c2 = TaskEx.CancelledTaskT<bool>().CancellableAwait(default(CancellationToken));
-            try {
-                await c2; Assert.Fail();
-            } catch (OperationCanceledException) { }
-            var c3 = TaskEx.FaultedTask(new ArgumentException()).CancellableAwait(default(CancellationToken));
-            try {
-                await c3; Assert.Fail();
-            } catch (ArgumentException) { }
-            var c4 = TaskEx.FaultedTaskT<bool>(new ArgumentException()).CancellableAwait(default(CancellationToken));
-            try {
-                await c4; Assert.Fail();
-            } catch (ArgumentException) { }
-
-            await Task.Delay(50).CancellableAwait(default(CancellationToken));
-            await Task.Delay(25).ContinueWith(e => 1).CancellableAwait(default(CancellationToken));
-
-            var td = Task.Delay(TimeSpan.FromSeconds(10));
-            try {
-                await td.CancellableAwait(c.Token);
-            } catch (OperationCanceledException) { }
-            try {
-                await td.ContinueWith(e => 1).CancellableAwait(c.Token);
-            } catch (OperationCanceledException) { }
-            td.AssertNotCompleted();
-        });
-    }
-    [TestMethod]
     public void ContextAwait() {
         var context1 = new ExclusiveSynchronizationContext();
         var context2 = new ExclusiveSynchronizationContext();
@@ -106,17 +56,6 @@ public class TaskExTest {
             tforce.AssertNotCompleted();
             t.SetRanToCompletion();
             tforce.AssertRanToCompletion();
-
-            // cancellable entry
-            var ct = new CancellationTokenSource();
-            ct.Cancel();
-            try {
-                await context1.AwaitableEntrance(ct.Token, forceReentry: false); Assert.Fail();
-            } catch (OperationCanceledException) { }
-            try {
-                await context1.AwaitableEntrance(ct.Token, forceReentry: true); Assert.Fail();
-            } catch (OperationCanceledException) { }
-            await context1.AwaitableEntrance(default(CancellationToken));
         });
     }
     [TestMethod]
@@ -140,132 +79,132 @@ public class TaskExTest {
     [TestMethod]
     public void TrySetFromFinishedTask() {
         var ts = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource<int>()).ToArray();
-        Assert.IsTrue(ts[0].TrySetFromFinishedTask(Task.FromResult(1)));
+        Assert.IsTrue(ts[0].TrySetFromCompletedTask(Task.FromResult(1)));
         Assert.IsTrue(ts[0].Task.IsRanToCompletion() && ts[0].Task.Result == 1);
 
-        Util.ExpectException<ArgumentException>(() => ts[0].TrySetFromFinishedTask(Task.Delay(10).ContinueWith(e => 5)));
-        Assert.IsTrue(!ts[0].TrySetFromFinishedTask(Task.FromResult(1)));
-        Assert.IsTrue(!ts[0].TrySetFromFinishedTask(TaskEx.CancelledTaskT<int>()));
-        Assert.IsTrue(!ts[0].TrySetFromFinishedTask(TaskEx.FaultedTaskT<int>(new ArgumentException())));
+        Util.ExpectException<ArgumentException>(() => ts[0].TrySetFromCompletedTask(Task.Delay(10).ContinueWith(e => 5)));
+        Assert.IsTrue(!ts[0].TrySetFromCompletedTask(Task.FromResult(1)));
+        Assert.IsTrue(!ts[0].TrySetFromCompletedTask(TaskEx.CancelledTaskT<int>()));
+        Assert.IsTrue(!ts[0].TrySetFromCompletedTask(TaskEx.FaultedTaskT<int>(new ArgumentException())));
 
-        Assert.IsTrue(ts[1].TrySetFromFinishedTask(TaskEx.CancelledTaskT<int>()));
+        Assert.IsTrue(ts[1].TrySetFromCompletedTask(TaskEx.CancelledTaskT<int>()));
         Assert.IsTrue(ts[1].Task.IsCanceled);
 
-        Assert.IsTrue(ts[2].TrySetFromFinishedTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException())));
+        Assert.IsTrue(ts[2].TrySetFromCompletedTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException())));
         Assert.IsTrue(ts[2].Task.IsFaulted && ts[2].Task.Exception.InnerExceptions.Single() is InvalidOperationException);
 
         var vs = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource()).ToArray();
-        Assert.IsTrue(vs[0].TrySetFromFinishedTask(Task.FromResult(1)));
+        Assert.IsTrue(vs[0].TrySetFromCompletedTask(Task.FromResult(1)));
         Assert.IsTrue(vs[0].Task.IsRanToCompletion());
 
-        Util.ExpectException<ArgumentException>(() => vs[0].TrySetFromFinishedTask(Task.Delay(10).ContinueWith(e => 5)));
-        Assert.IsTrue(!vs[0].TrySetFromFinishedTask(Task.FromResult(1)));
-        Assert.IsTrue(!vs[0].TrySetFromFinishedTask(TaskEx.CancelledTask));
-        Assert.IsTrue(!vs[0].TrySetFromFinishedTask(TaskEx.FaultedTask(new ArgumentException())));
+        Util.ExpectException<ArgumentException>(() => vs[0].TrySetFromCompletedTask(Task.Delay(10).ContinueWith(e => 5)));
+        Assert.IsTrue(!vs[0].TrySetFromCompletedTask(Task.FromResult(1)));
+        Assert.IsTrue(!vs[0].TrySetFromCompletedTask(TaskEx.CancelledTask));
+        Assert.IsTrue(!vs[0].TrySetFromCompletedTask(TaskEx.FaultedTask(new ArgumentException())));
 
-        Assert.IsTrue(vs[1].TrySetFromFinishedTask(TaskEx.CancelledTask));
+        Assert.IsTrue(vs[1].TrySetFromCompletedTask(TaskEx.CancelledTask));
         Assert.IsTrue(vs[1].Task.IsCanceled);
 
-        Assert.IsTrue(vs[2].TrySetFromFinishedTask(TaskEx.FaultedTask(new InvalidOperationException())));
+        Assert.IsTrue(vs[2].TrySetFromCompletedTask(TaskEx.FaultedTask(new InvalidOperationException())));
         Assert.IsTrue(vs[2].Task.IsFaulted && vs[2].Task.Exception.InnerExceptions.Single() is InvalidOperationException);
     }
 
     [TestMethod]
     public void SetFromFinishedTask() {
         var ts = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource<int>()).ToArray();
-        ts[0].SetFromFinishedTask(Task.FromResult(1));
+        ts[0].SetFromCompletedTask(Task.FromResult(1));
         Assert.IsTrue(ts[0].Task.IsRanToCompletion() && ts[0].Task.Result == 1);
 
-        Util.ExpectException<ArgumentException>(() => ts[0].SetFromFinishedTask(Task.Delay(10).ContinueWith(e => 5)));
-        Util.ExpectException<InvalidOperationException>(() => ts[0].SetFromFinishedTask(Task.FromResult(1)));
-        Util.ExpectException<InvalidOperationException>(() => ts[0].SetFromFinishedTask(TaskEx.CancelledTaskT<int>()));
-        Util.ExpectException<InvalidOperationException>(() => ts[0].SetFromFinishedTask(TaskEx.FaultedTaskT<int>(new ArgumentException())));
+        Util.ExpectException<ArgumentException>(() => ts[0].SetFromCompletedTask(Task.Delay(10).ContinueWith(e => 5)));
+        Util.ExpectException<InvalidOperationException>(() => ts[0].SetFromCompletedTask(Task.FromResult(1)));
+        Util.ExpectException<InvalidOperationException>(() => ts[0].SetFromCompletedTask(TaskEx.CancelledTaskT<int>()));
+        Util.ExpectException<InvalidOperationException>(() => ts[0].SetFromCompletedTask(TaskEx.FaultedTaskT<int>(new ArgumentException())));
 
-        ts[1].SetFromFinishedTask(TaskEx.CancelledTaskT<int>());
+        ts[1].SetFromCompletedTask(TaskEx.CancelledTaskT<int>());
         Assert.IsTrue(ts[1].Task.IsCanceled);
 
-        ts[2].SetFromFinishedTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException()));
+        ts[2].SetFromCompletedTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException()));
         Assert.IsTrue(ts[2].Task.IsFaulted && ts[2].Task.Exception.InnerExceptions.Single() is InvalidOperationException);
 
         var vs = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource()).ToArray();
-        vs[0].SetFromFinishedTask(Task.FromResult(1));
+        vs[0].SetFromCompletedTask(Task.FromResult(1));
         Assert.IsTrue(vs[0].Task.IsRanToCompletion());
 
-        Util.ExpectException<ArgumentException>(() => vs[0].SetFromFinishedTask(Task.Delay(10).ContinueWith(e => 5)));
-        Util.ExpectException<InvalidOperationException>(() => vs[0].SetFromFinishedTask(Task.FromResult(1)));
-        Util.ExpectException<InvalidOperationException>(() => vs[0].SetFromFinishedTask(TaskEx.CancelledTask));
-        Util.ExpectException<InvalidOperationException>(() => vs[0].SetFromFinishedTask(TaskEx.FaultedTask(new ArgumentException())));
+        Util.ExpectException<ArgumentException>(() => vs[0].SetFromCompletedTask(Task.Delay(10).ContinueWith(e => 5)));
+        Util.ExpectException<InvalidOperationException>(() => vs[0].SetFromCompletedTask(Task.FromResult(1)));
+        Util.ExpectException<InvalidOperationException>(() => vs[0].SetFromCompletedTask(TaskEx.CancelledTask));
+        Util.ExpectException<InvalidOperationException>(() => vs[0].SetFromCompletedTask(TaskEx.FaultedTask(new ArgumentException())));
 
-        vs[1].SetFromFinishedTask(TaskEx.CancelledTask);
+        vs[1].SetFromCompletedTask(TaskEx.CancelledTask);
         Assert.IsTrue(vs[1].Task.IsCanceled);
 
-        vs[2].SetFromFinishedTask(TaskEx.FaultedTask(new InvalidOperationException()));
+        vs[2].SetFromCompletedTask(TaskEx.FaultedTask(new InvalidOperationException()));
         Assert.IsTrue(vs[2].Task.IsFaulted && vs[2].Task.Exception.InnerExceptions.Single() is InvalidOperationException);
     }
 
     [TestMethod]
     public void TrySetFromTaskAsync() {
         var ts = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource<int>()).ToArray();
-        Assert.IsTrue(ts[0].TrySetFromTaskAsync(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
+        Assert.IsTrue(ts[0].EventuallyTrySetFromTask(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
         Assert.IsTrue(ts[0].Task.AssertRanToCompletion() == 5);
 
-        Assert.IsTrue(!ts[0].TrySetFromTaskAsync(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
-        Assert.IsTrue(!ts[0].TrySetFromTaskAsync(Task.FromResult(1)).AssertRanToCompletion());
-        Assert.IsTrue(!ts[0].TrySetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
-        Assert.IsTrue(!ts[0].TrySetFromTaskAsync(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertRanToCompletion());
+        Assert.IsTrue(!ts[0].EventuallyTrySetFromTask(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
+        Assert.IsTrue(!ts[0].EventuallyTrySetFromTask(Task.FromResult(1)).AssertRanToCompletion());
+        Assert.IsTrue(!ts[0].EventuallyTrySetFromTask(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
+        Assert.IsTrue(!ts[0].EventuallyTrySetFromTask(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertRanToCompletion());
 
-        Assert.IsTrue(ts[1].TrySetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
+        Assert.IsTrue(ts[1].EventuallyTrySetFromTask(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
         ts[1].Task.AssertCancelled();
 
-        Assert.IsTrue(ts[2].TrySetFromTaskAsync(TaskEx.FaultedTaskT<int>(new InvalidOperationException())).AssertRanToCompletion());
+        Assert.IsTrue(ts[2].EventuallyTrySetFromTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException())).AssertRanToCompletion());
         ts[2].Task.AssertFailed<InvalidOperationException>();
 
         var vs = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource()).ToArray();
-        Assert.IsTrue(vs[0].TrySetFromTaskAsync(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
+        Assert.IsTrue(vs[0].EventuallyTrySetFromTask(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
         vs[0].Task.AssertRanToCompletion();
 
-        Assert.IsTrue(!vs[0].TrySetFromTaskAsync(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
-        Assert.IsTrue(!vs[0].TrySetFromTaskAsync(Task.FromResult(1)).AssertRanToCompletion());
-        Assert.IsTrue(!vs[0].TrySetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
-        Assert.IsTrue(!vs[0].TrySetFromTaskAsync(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertRanToCompletion());
+        Assert.IsTrue(!vs[0].EventuallyTrySetFromTask(Task.Delay(10).ContinueWith(e => 5)).AssertRanToCompletion());
+        Assert.IsTrue(!vs[0].EventuallyTrySetFromTask(Task.FromResult(1)).AssertRanToCompletion());
+        Assert.IsTrue(!vs[0].EventuallyTrySetFromTask(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
+        Assert.IsTrue(!vs[0].EventuallyTrySetFromTask(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertRanToCompletion());
 
-        Assert.IsTrue(vs[1].TrySetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
+        Assert.IsTrue(vs[1].EventuallyTrySetFromTask(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion());
         vs[1].Task.AssertCancelled();
 
-        Assert.IsTrue(vs[2].TrySetFromTaskAsync(TaskEx.FaultedTaskT<int>(new InvalidOperationException())).AssertRanToCompletion());
+        Assert.IsTrue(vs[2].EventuallyTrySetFromTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException())).AssertRanToCompletion());
         vs[2].Task.AssertFailed<InvalidOperationException>();
     }
 
     [TestMethod]
     public void SetFromTaskAsync() {
         var ts = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource<int>()).ToArray();
-        ts[0].SetFromTaskAsync(Task.FromResult(1)).AssertRanToCompletion();
+        ts[0].EventuallySetFromTask(Task.FromResult(1)).AssertRanToCompletion();
         Assert.IsTrue(ts[0].Task.IsRanToCompletion() && ts[0].Task.Result == 1);
 
-        ts[0].SetFromTaskAsync(Task.Delay(10).ContinueWith(e => 5)).AssertFailed<InvalidOperationException>();
-        ts[0].SetFromTaskAsync(Task.FromResult(1)).AssertFailed<InvalidOperationException>();
-        ts[0].SetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertFailed<InvalidOperationException>();
-        ts[0].SetFromTaskAsync(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertFailed<InvalidOperationException>();
+        ts[0].EventuallySetFromTask(Task.Delay(10).ContinueWith(e => 5)).AssertFailed<InvalidOperationException>();
+        ts[0].EventuallySetFromTask(Task.FromResult(1)).AssertFailed<InvalidOperationException>();
+        ts[0].EventuallySetFromTask(TaskEx.CancelledTaskT<int>()).AssertFailed<InvalidOperationException>();
+        ts[0].EventuallySetFromTask(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertFailed<InvalidOperationException>();
 
-        ts[1].SetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion();
+        ts[1].EventuallySetFromTask(TaskEx.CancelledTaskT<int>()).AssertRanToCompletion();
         ts[1].Task.AssertCancelled();
 
-        ts[2].SetFromTaskAsync(TaskEx.FaultedTaskT<int>(new InvalidOperationException())).AssertRanToCompletion();
+        ts[2].EventuallySetFromTask(TaskEx.FaultedTaskT<int>(new InvalidOperationException())).AssertRanToCompletion();
         ts[2].Task.AssertFailed<InvalidOperationException>();
 
         var vs = Enumerable.Range(0, 3).Select(e => new TaskCompletionSource()).ToArray();
-        vs[0].SetFromTaskAsync(Task.FromResult(1)).AssertRanToCompletion();
+        vs[0].EventuallySetFromTask(Task.FromResult(1)).AssertRanToCompletion();
         Assert.IsTrue(vs[0].Task.IsRanToCompletion());
 
-        vs[0].SetFromTaskAsync(Task.Delay(10).ContinueWith(e => 5)).AssertFailed<InvalidOperationException>();
-        vs[0].SetFromTaskAsync(Task.FromResult(1)).AssertFailed<InvalidOperationException>();
-        vs[0].SetFromTaskAsync(TaskEx.CancelledTaskT<int>()).AssertFailed<InvalidOperationException>();
-        vs[0].SetFromTaskAsync(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertFailed<InvalidOperationException>();
+        vs[0].EventuallySetFromTask(Task.Delay(10).ContinueWith(e => 5)).AssertFailed<InvalidOperationException>();
+        vs[0].EventuallySetFromTask(Task.FromResult(1)).AssertFailed<InvalidOperationException>();
+        vs[0].EventuallySetFromTask(TaskEx.CancelledTaskT<int>()).AssertFailed<InvalidOperationException>();
+        vs[0].EventuallySetFromTask(TaskEx.FaultedTaskT<int>(new ArgumentException())).AssertFailed<InvalidOperationException>();
 
-        vs[1].SetFromTaskAsync(TaskEx.CancelledTask).AssertRanToCompletion();
+        vs[1].EventuallySetFromTask(TaskEx.CancelledTask).AssertRanToCompletion();
         vs[1].Task.AssertCancelled();
 
-        vs[2].SetFromTaskAsync(TaskEx.FaultedTask(new InvalidOperationException())).AssertRanToCompletion();
+        vs[2].EventuallySetFromTask(TaskEx.FaultedTask(new InvalidOperationException())).AssertRanToCompletion();
         vs[2].Task.AssertFailed<InvalidOperationException>();
     }
 
