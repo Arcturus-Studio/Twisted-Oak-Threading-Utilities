@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Contains extensions methods related to awaitables.</summary>
     public static class AwaitableExtensions {
         ///<summary>A task that completes with the same result as a given awaitable.</summary>

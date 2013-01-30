@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskEx", "TaskEx\TaskEx.csproj", "{F8A144FF-E737-49E2-A876-7BA32F043F66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwistedOakThreading", "TwistedOakThreading\TwistedOakThreading.csproj", "{F8A144FF-E737-49E2-A876-7BA32F043F66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskExTest", "TaskExTest\TaskExTest.csproj", "{068828CA-E098-4EDD-BFF3-DB3DC3AE639E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwistedOakThreadingTest", "TwistedOakThreadingTest\TwistedOakThreadingTest.csproj", "{068828CA-E098-4EDD-BFF3-DB3DC3AE639E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

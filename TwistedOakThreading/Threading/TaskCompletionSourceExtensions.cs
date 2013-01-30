@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Contains extension methods for manipulating task completion sources.</summary>
     public static class TaskCompletionSourceExtensions {
         ///<summary>Transitions the task source into the same state as the given completed task.</summary>

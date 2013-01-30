@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwistedOak.Util.TaskEx;
+using TwistedOak.Threading;
 using System.Linq;
 
 internal static class Util {

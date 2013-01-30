@@ -7,12 +7,13 @@
     <ProjectGuid>{F8A144FF-E737-49E2-A876-7BA32F043F66}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TwistedOak.Util.TaskEx</RootNamespace>
-    <AssemblyName>TaskEx</AssemblyName>
+    <RootNamespace>TwistedOak</RootNamespace>
+    <AssemblyName>TwistedOakThreading</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +25,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\TaskEx.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\TwistedOakThreading.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,25 +35,25 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>bin\Release\TaskEx.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\TwistedOakThreading.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Async\AnonymousAwaitable.cs" />
-    <Compile Include="Async\AnonymousAwaiter.cs" />
-    <Compile Include="Async\AnonymousSynchronizationContext.cs" />
-    <Compile Include="Async\AwaitableExtensions.cs" />
-    <Compile Include="Async\Tasks.cs" />
-    <Compile Include="Async\TaskCompletionSourceExtensions.cs" />
-    <Compile Include="Async\ExclusiveSynchronizationContext.cs" />
-    <Compile Include="Async\IAwaitable.cs" />
-    <Compile Include="Async\IAwaiter.cs" />
-    <Compile Include="Async\OnetimeLock.cs" />
-    <Compile Include="Async\SynchronizationContextExtensions.cs" />
-    <Compile Include="Async\TaskCompletionSource.cs" />
-    <Compile Include="Async\TaskExtensions.cs" />
+    <Compile Include="Threading\AnonymousAwaitable.cs" />
+    <Compile Include="Threading\AnonymousAwaiter.cs" />
+    <Compile Include="Threading\AnonymousSynchronizationContext.cs" />
+    <Compile Include="Threading\AwaitableExtensions.cs" />
+    <Compile Include="Threading\Tasks.cs" />
+    <Compile Include="Threading\TaskCompletionSourceExtensions.cs" />
+    <Compile Include="Threading\ExclusiveSynchronizationContext.cs" />
+    <Compile Include="Threading\IAwaitable.cs" />
+    <Compile Include="Threading\IAwaiter.cs" />
+    <Compile Include="Threading\OnetimeLock.cs" />
+    <Compile Include="Threading\SynchronizationContextExtensions.cs" />
+    <Compile Include="Threading\TaskCompletionSource.cs" />
+    <Compile Include="Threading\TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

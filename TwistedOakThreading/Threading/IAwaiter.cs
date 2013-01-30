@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Handles awaiting, in order to get a value.</summary>
     public interface IAwaiter<out T> : INotifyCompletion {
         ///<summary>Determines if OnCompleted needs to be called or not, in order to access the result.</summary>

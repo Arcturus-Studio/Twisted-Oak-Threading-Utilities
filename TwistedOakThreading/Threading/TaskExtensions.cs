@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Contains extension methods related to tasks.</summary>
     public static class TaskExtensions {
         ///<summary>Determines if the task has ran to completion, as opposed to being faulted, cancelled, or not yet completed.</summary>

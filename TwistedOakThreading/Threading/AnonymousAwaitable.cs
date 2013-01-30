@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     /// <summary>A custom generic IAwaitable, implemented with delegates passed to the constructor.</summary>
     [DebuggerStepThrough]
     public sealed class AnonymousAwaitable<T> : IAwaitable<T> {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Contains factory methods and properties for tasks.</summary>
     public static class Tasks {
         ///<summary>A task that ran to completion.</summary>

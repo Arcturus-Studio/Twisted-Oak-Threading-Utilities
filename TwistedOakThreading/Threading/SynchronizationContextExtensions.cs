@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Contains extension methods for working with synchronization contexts.</summary>
     public static class SynchronizationContextExtensions {
         ///<summary>Posts an action to the synchronization context, exposing its eventual completion as a task.</summary>

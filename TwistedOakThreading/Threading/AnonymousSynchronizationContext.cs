@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>
     ///A custom synchronization context, implemented with a post delegate passed to the constructor.
     ///Automatically exposes itself as the current synchronization context, when running posted methods.

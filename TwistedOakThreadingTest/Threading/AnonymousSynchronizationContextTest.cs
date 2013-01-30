@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwistedOak.Util.TaskEx;
+using TwistedOak.Threading;
 
 [TestClass]
 public class AnonymousSynchronizationContextTest {

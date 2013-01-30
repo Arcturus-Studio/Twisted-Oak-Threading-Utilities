@@ -6,8 +6,8 @@
     <ProjectGuid>{068828CA-E098-4EDD-BFF3-DB3DC3AE639E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TaskExTest</RootNamespace>
-    <AssemblyName>TaskExTest</AssemblyName>
+    <RootNamespace>TwistedOakThreadingTest</RootNamespace>
+    <AssemblyName>TwistedOakThreadingTest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -54,23 +54,23 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Async\AnonymousAwaitTest.cs" />
-    <Compile Include="Async\AnonymousSynchronizationContextTest.cs" />
-    <Compile Include="Async\AwaitableExtensionsTest.cs" />
-    <Compile Include="Async\TaskCompletionSourceExtensionsTest.cs" />
-    <Compile Include="Async\TasksTest.cs" />
-    <Compile Include="Async\TaskCompletionSourceTest.cs" />
-    <Compile Include="Async\SynchronizationContextExtensionsTest.cs" />
-    <Compile Include="Async\ExclusiveSynchronizationContextTest.cs" />
-    <Compile Include="Async\OnetimeLockTest.cs" />
-    <Compile Include="Async\TaskExtensionsTest.cs" />
+    <Compile Include="Threading\AnonymousAwaitTest.cs" />
+    <Compile Include="Threading\AnonymousSynchronizationContextTest.cs" />
+    <Compile Include="Threading\AwaitableExtensionsTest.cs" />
+    <Compile Include="Threading\TaskCompletionSourceExtensionsTest.cs" />
+    <Compile Include="Threading\TasksTest.cs" />
+    <Compile Include="Threading\TaskCompletionSourceTest.cs" />
+    <Compile Include="Threading\SynchronizationContextExtensionsTest.cs" />
+    <Compile Include="Threading\ExclusiveSynchronizationContextTest.cs" />
+    <Compile Include="Threading\OnetimeLockTest.cs" />
+    <Compile Include="Threading\TaskExtensionsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TaskEx\TaskEx.csproj">
+    <ProjectReference Include="..\TaskEx\TwistedOakThreading.csproj">
       <Project>{f8a144ff-e737-49e2-a876-7ba32f043f66}</Project>
-      <Name>ElementPortableLibrary</Name>
+      <Name>TwistedOakThreading</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

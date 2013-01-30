@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>The producer side of a System.Threading.Tasks.Task unbound to a delegate, providing access to the consumer side through a Task property.</summary>
     [DebuggerDisplay("{ToString()}")]
     public sealed class TaskCompletionSource {

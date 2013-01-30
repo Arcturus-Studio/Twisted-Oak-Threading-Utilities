@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace TwistedOak.Util.TaskEx {
+namespace TwistedOak.Threading {
     ///<summary>Runs posted methods in order, without overlap, on some underlying synchronization context.</summary>
     public sealed class ExclusiveSynchronizationContext : SynchronizationContext {
         private readonly SynchronizationContext _subContext;

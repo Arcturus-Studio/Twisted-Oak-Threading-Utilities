@@ -1,4 +1,4 @@
-﻿namespace TwistedOak.Util.TaskEx {
+﻿namespace TwistedOak.Threading {
     ///<summary>Can be awaited, in order to get a value.</summary>
     public interface IAwaitable<out T> {
         ///<summary>Gets an awaiter to handle awaiting.</summary>

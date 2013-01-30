@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwistedOak.Util.TaskEx;
+using TwistedOak.Threading;
 using System.Threading.Tasks;
 
 [TestClass]
