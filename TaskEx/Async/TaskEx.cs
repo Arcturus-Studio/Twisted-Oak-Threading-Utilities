@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using TwistedOak.Element.Util;
 
 namespace TwistedOak.Util.TaskEx {
+    ///<summary>Contains extension methods related to tasks.</summary>
     public static class TaskEx {
         private static readonly Task CachedCompletedTask = Task.FromResult(true);
         private static readonly Task CachedCancelledTask = CancelledTaskT<bool>();
@@ -14,8 +14,16 @@ namespace TwistedOak.Util.TaskEx {
         ///<summary>A task that has been cancelled.</summary>
         public static Task CancelledTask { get { return CachedCancelledTask; } }
         ///<summary>Returns a task that has faulted with the given exception.</summary>
-        public static Task FaultedTask(Exception ex) {
-            return FaultedTaskT<bool>(ex);
+        public static Task FaultedTask(Exception exception) {
+            var t = new TaskCompletionSource();
+            t.SetException(exception);
+            return t.Task;
+        }
+        ///<summary>Returns a task that has faulted with the given exceptions.</summary>
+        public static Task FaultedTask(IEnumerable<Exception> exceptions) {
+            var t = new TaskCompletionSource();
+            t.SetException(exceptions);
+            return t.Task;
         }
 
         ///<summary>Returns a typed task that has been cancelled.</summary>
@@ -24,30 +32,32 @@ namespace TwistedOak.Util.TaskEx {
             t.SetCanceled();
             return t.Task;
         }
-        ///<summary>Returns a typed task that has fauled with the given exception.</summary>
-        public static Task<T> FaultedTaskT<T>(Exception ex) {
+        ///<summary>Returns a typed task that has faulted with the given exception.</summary>
+        public static Task<T> FaultedTaskT<T>(Exception exception) {
             var t = new TaskCompletionSource<T>();
-            t.SetException(ex);
+            t.SetException(exception);
+            return t.Task;
+        }
+        ///<summary>Returns a typed task that has faulted with the given exceptions.</summary>
+        public static Task<T> FaultedTaskT<T>(IEnumerable<Exception> exceptions) {
+            var t = new TaskCompletionSource<T>();
+            t.SetException(exceptions);
             return t.Task;
         }
 
-#pragma warning disable 1998 // await operator not used in async method
-        /// <summary>Safely evaluates a function, returning a Task based on its result or failure.</summary>
-        /// <remarks>The 'async' modifier packages thrown exceptions into the resulting task, despite no awaits.</remarks>
-        public static async Task<T> EvalIntoTask<T>(this Func<T> func) {
-            if (func == null) throw new ArgumentNullException("func");
-            return func();
+        ///<summary>A task that runs to completion (with the given task as the result) when the given task either runs to completion, faults, or cancels.</summary>
+        public static Task<Task<T>> AnyTypeOfCompletion<T>(this Task<T> task) {
+            return task.ContinueWith(e => e, TaskContinuationOptions.ExecuteSynchronously);
         }
-        /// <summary>Safely executes an action, returning a Task based on its success or failure.</summary>
-        /// <remarks>The 'async' modifier packages thrown exceptions into the resulting task, despite no awaits.</remarks>
-        public static async Task ExecuteIntoTask(this Action action) {
-            if (action == null) throw new ArgumentNullException("action");
-            action();
+
+        ///<summary>A task that runs to completion (with the given task as the result) when the given task either runs to completion, faults, or cancels.</summary>
+        public static Task<Task> AnyTypeOfCompletion(this Task task) {
+            return task.ContinueWith(e => e, TaskContinuationOptions.ExecuteSynchronously);
         }
-#pragma warning restore 1998
 
         /// <summary>
-        /// Returns a task whose result is obtained by projecting the result of the given task.
+        /// The eventual result of evaluating a function after a task runs to completion.
+        /// The projection is evaluated in the same synchronization context as the caller.
         /// Cancellation and exceptions are propagated.
         /// </summary>
         public static async Task<T> Select<T>(this Task task, Func<T> projection) {
@@ -56,8 +66,10 @@ namespace TwistedOak.Util.TaskEx {
             await task;
             return projection();
         }
+
         /// <summary>
-        /// Returns a task whose result is obtained by projecting the result of the given task.
+        /// The eventual result of applying a projection to the task's result.
+        /// The projection is evaluated in the same synchronization context as the caller.
         /// Cancellation and exceptions are propagated.
         /// </summary>
         public static async Task<TOut> Select<TIn, TOut>(this Task<TIn> task, Func<TIn, TOut> projection) {
@@ -67,19 +79,24 @@ namespace TwistedOak.Util.TaskEx {
         }
 
         /// <summary>
-        /// Returns a task whose result is the same as the given task, unless it is cancelled, in which case it is the result of the given function.
+        /// Replaces a task's eventual cancellation with the result of evaluating a function.
+        /// If the task runs to completion or faults, then the result is propagated without evaluating the function.
+        /// The function is evaluated in the same synchronization context as the caller.
         /// </summary>
-        public static async Task<T> ProjectCancelled<T>(this Task<T> task, Func<T> cancelledProjection) {
+        public static async Task<T> SelectWhenCancelled<T>(this Task<T> task, Func<T> cancelledProjection) {
             if (task == null) throw new ArgumentNullException("task");
             if (cancelledProjection == null) throw new ArgumentNullException("cancelledProjection");
             await task.AnyTypeOfCompletion();
             if (task.IsCanceled) return cancelledProjection();
             return await task;
         }
+
         /// <summary>
-        /// Returns a task whose result is the same as the given task, unless it is cancelled, in which case it is the result of the given action.
+        /// Replaces a task's eventual cancellation with the result of evaluating a function.
+        /// If the task runs to completion or faults, then the result is propagated without evaluating the function.
+        /// The function is evaluated in the same synchronization context as the caller.
         /// </summary>
-        public static async Task ProjectCancelled(this Task task, Action cancelledProjection) {
+        public static async Task SelectWhenCancelled(this Task task, Action cancelledProjection) {
             if (task == null) throw new ArgumentNullException("task");
             if (cancelledProjection == null) throw new ArgumentNullException("cancelledProjection");
             await task.AnyTypeOfCompletion();
@@ -93,7 +110,7 @@ namespace TwistedOak.Util.TaskEx {
         public static Task<T> CancelExceptionToCancelled<T>(this Task<T> task) {
             return task.ContinueWith(e => {
                 if (e.IsFaulted && e.Exception.Collapse() is OperationCanceledException) {
-                    return TaskEx.CancelledTaskT<T>();
+                    return CancelledTaskT<T>();
                 }
                 return e;
             }, TaskContinuationOptions.ExecuteSynchronously).Unwrap();
@@ -155,22 +172,13 @@ namespace TwistedOak.Util.TaskEx {
             task.ContinueWith(t => t.IsFaulted ? t.Exception : null, TaskContinuationOptions.ExecuteSynchronously);
         }
 
-        ///<summary>Returns a task that completes succesfully when the underlying task finishes (whether or not it runs to completion, faults, or cancels).</summary>
-        public static Task<Task<T>> AnyTypeOfCompletion<T>(this Task<T> task) {
-            return task.ContinueWith(e => e, TaskContinuationOptions.ExecuteSynchronously);
-        }
-        ///<summary>Returns a task that completes succesfully when the underlying task finishes (whether or not it runs to completion, faults, or cancels).</summary>
-        public static Task<Task> AnyTypeOfCompletion(this Task task) {
-            return task.ContinueWith(e => e, TaskContinuationOptions.ExecuteSynchronously);
-        }
-
         /// <summary>
         /// Eventually determines if a task completed succesfully (true) or was cancelled (false).
         /// If the task faults, the exception is propagated.
         /// </summary>
         public static Task<bool> CompletionNotCancelledAsync(this Task task) {
             if (task == null) throw new ArgumentNullException("task");
-            return task.Select(() => true).ProjectCancelled(() => false);
+            return task.Select(() => true).SelectWhenCancelled(() => false);
         }
 
         public static async Task AsTask(this IAwaitable awaitable) {
@@ -196,15 +204,19 @@ namespace TwistedOak.Util.TaskEx {
             });
         }
 
+        ///<summary>A task that will complete when all of the supplied tasks have completed.</summary>
         public static Task<T[]> WhenAll<T>(this IEnumerable<Task<T>> tasks) {
             return Task.WhenAll(tasks);
         }
+        ///<summary>A task that will complete when all of the supplied tasks have completed.</summary>
         public static Task WhenAll(this IEnumerable<Task> tasks) {
             return Task.WhenAll(tasks);
         }
+        ///<summary>A task that will complete when any of the supplied tasks have completed.</summary>
         public static Task<Task<T>> WhenAny<T>(this IEnumerable<Task<T>> tasks) {
             return Task.WhenAny(tasks);
         }
+        ///<summary>A task that will complete when any of the supplied tasks have completed.</summary>
         public static Task<Task> WhenAny(this IEnumerable<Task> tasks) {
             return Task.WhenAny(tasks);
         }
