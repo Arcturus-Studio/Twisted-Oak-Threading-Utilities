@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwistedOak.Util.TaskEx;
 using System.Threading.Tasks;

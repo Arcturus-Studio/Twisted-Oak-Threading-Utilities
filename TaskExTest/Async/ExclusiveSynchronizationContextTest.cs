@@ -18,7 +18,7 @@ public class ExclusiveSynchronizationContextTest {
     public void NoInterference() {
         var r = new ExclusiveSynchronizationContext();
         var n = 0;
-        var t = Task.WhenAll(Enumerable.Range(0, 5).Select(async e => await Util.RunAsync(() => {
+        var t = Task.WhenAll(Enumerable.Range(0, 5).Select(async e => await Task.Factory.StartNew(() => {
             for (var i = 0; i < 500; i++) {
                 r.Post(z => {
                     n += 1;

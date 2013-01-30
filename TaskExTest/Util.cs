@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwistedOak.Util.TaskEx;
-using System.Threading;
 using System.Linq;
 
 internal static class Util {
@@ -48,26 +47,6 @@ internal static class Util {
         }
         throw new InvalidOperationException("Expected an exception.");
     }
-    public static Action Ack<T>(Func<T> func) {
-        return () => func();
-    }
-    public static void AsyncTest(Func<Task> test, TimeSpan? timeout = null) {
-        RunAsyncAwait(test).AssertRanToCompletion(timeout ?? TimeSpan.FromSeconds(10));
-    }
-    public static void AssertCancelled(this CancellationToken ct, TimeSpan? timeout = null) {
-        var r = new TaskCompletionSource();
-        ct.Register(() => r.TrySetRanToCompletion());
-        Task.Delay(timeout ?? TimeSpan.FromSeconds(5)).ContinueWith(e => r.TrySetRanToCompletion());
-        r.Task.Wait();
-        Assert.IsTrue(ct.IsCancellationRequested);
-    }
-    public static void AssertNotCancelled(this CancellationToken ct, TimeSpan? timeout = null) {
-        var r = new TaskCompletionSource();
-        ct.Register(() => r.TrySetRanToCompletion());
-        Task.Delay(timeout ?? TimeSpan.FromMilliseconds(25)).ContinueWith(e => r.TrySetRanToCompletion());
-        r.Task.Wait();
-        Assert.IsTrue(!ct.IsCancellationRequested);
-    }
     public static void AssertRanToCompletion(this Task t, TimeSpan? timeout = null) {
         t.TestWait(timeout ?? TimeSpan.FromSeconds(5));
         Assert.IsTrue(t.Status == TaskStatus.RanToCompletion);
@@ -97,56 +76,10 @@ internal static class Util {
         t.TestWait(timeout ?? TimeSpan.FromSeconds(5));
         Assert.IsTrue(t.Status == TaskStatus.Canceled);
     }
-    public static Task<T> Timeout<T>(this Task<T> t, TimeSpan? timeout = null) {
-        var r = new TaskCompletionSource<T>();
-        t.ContinueWith(self => {
-            if (t.IsFaulted) r.TrySetException(t.Exception);
-            else if (t.IsCanceled) r.TrySetCanceled();
-            else if (t.IsCompleted) r.TrySetResult(t.Result);
-            else r.TrySetException(new InvalidOperationException("??"));
-        });
-        Task.Delay(timeout ?? TimeSpan.FromSeconds(1)).ContinueWith(self => r.TrySetException(new AssertFailedException("Timeout")));
-        return r.Task;
-    }
-    public static Task Timeout(this Task t, TimeSpan? timeout = null) {
-        var r = new TaskCompletionSource();
-        t.ContinueWith(self => {
-            if (t.IsFaulted) r.TrySetException(t.Exception);
-            else if (t.IsCanceled) r.TrySetCanceled();
-            else if (t.IsCompleted) r.TrySetRanToCompletion();
-            else r.TrySetException(new InvalidOperationException("??"));
-        });
-        Task.Delay(timeout ?? TimeSpan.FromSeconds(1)).ContinueWith(self => r.TrySetException(new AssertFailedException("Timeout")));
-        return r.Task;
-    }
     public static void AssertNotCompleted(this Task t, TimeSpan? timeout = null) {
         t.TestWait(timeout ?? TimeSpan.FromMilliseconds(25));
         Assert.IsTrue(!t.IsCompleted);
         Assert.IsTrue(!t.IsFaulted);
         Assert.IsTrue(!t.IsCanceled);
-    }
-    public async static Task RunAsync(Action a) {
-        var t = new TaskCompletionSource();
-        await Task.Run(() => {
-            try {
-                a();
-                t.SetRanToCompletion();
-            } catch (Exception ex) {
-                t.SetException(ex);
-            }
-        });
-        await t.Task;
-    }
-    public async static Task RunAsyncAwait(Func<Task> a) {
-        var t = new TaskCompletionSource();
-        await Task.Run(async () => {
-            try {
-                await a();
-                t.SetRanToCompletion();
-            } catch (Exception ex) {
-                t.SetException(ex);
-            }
-        });
-        await t.Task;
     }
 }

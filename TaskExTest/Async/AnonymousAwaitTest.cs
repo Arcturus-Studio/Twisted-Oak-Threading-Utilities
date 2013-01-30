@@ -1,7 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwistedOak.Util.TaskEx;
-using System.Threading.Tasks;
 
 [TestClass]
 public class AnonymousAwaitableTest {
