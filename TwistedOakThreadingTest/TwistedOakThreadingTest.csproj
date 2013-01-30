@@ -57,6 +57,7 @@
     <Compile Include="Threading\AnonymousAwaitTest.cs" />
     <Compile Include="Threading\AnonymousSynchronizationContextTest.cs" />
     <Compile Include="Threading\AwaitableExtensionsTest.cs" />
+    <Compile Include="Threading\DiscardRedundantWorkThrottleTest.cs" />
     <Compile Include="Threading\TaskCompletionSourceExtensionsTest.cs" />
     <Compile Include="Threading\TasksTest.cs" />
     <Compile Include="Threading\TaskCompletionSourceTest.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TaskEx\TwistedOakThreading.csproj">
+    <ProjectReference Include="..\TwistedOakThreading\TwistedOakThreading.csproj">
       <Project>{f8a144ff-e737-49e2-a876-7ba32f043f66}</Project>
       <Name>TwistedOakThreading</Name>
     </ProjectReference>

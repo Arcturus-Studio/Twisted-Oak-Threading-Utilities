@@ -45,6 +45,7 @@
     <Compile Include="Threading\AnonymousAwaiter.cs" />
     <Compile Include="Threading\AnonymousSynchronizationContext.cs" />
     <Compile Include="Threading\AwaitableExtensions.cs" />
+    <Compile Include="Threading\DiscardRedundantWorkThrottle.cs" />
     <Compile Include="Threading\Tasks.cs" />
     <Compile Include="Threading\TaskCompletionSourceExtensions.cs" />
     <Compile Include="Threading\ExclusiveSynchronizationContext.cs" />
