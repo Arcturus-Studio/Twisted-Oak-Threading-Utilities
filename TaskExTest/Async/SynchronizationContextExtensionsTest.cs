@@ -51,9 +51,12 @@ public class SynchronizationContextExtensionsTest {
         var n = 0;
         r.PostAction(() => n = 1).AssertRanToCompletion();
         n.AssertEquals(1);
-        
+
         r.PostAction(() => { throw new InvalidOperationException(); }).AssertFailed<InvalidOperationException>();
+        r.PostAction(() => { throw new TaskCanceledException(); }).AssertCancelled();
+
         r.PostFunc(() => 2).AssertRanToCompletion().AssertEquals(2);
         r.PostFunc<int>(() => { throw new InvalidOperationException(); }).AssertFailed<InvalidOperationException>();
+        r.PostFunc<int>(() => { throw new TaskCanceledException(); }).AssertCancelled();
     }
 }

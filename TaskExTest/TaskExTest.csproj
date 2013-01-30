@@ -54,12 +54,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Async\AwaitTypesTest.cs" />
     <Compile Include="Async\AnonymousAwaitTest.cs" />
     <Compile Include="Async\AnonymousSynchronizationContextTest.cs" />
+    <Compile Include="Async\AwaitableExtensionsTest.cs" />
+    <Compile Include="Async\TaskCompletionSourceExtensionsTest.cs" />
+    <Compile Include="Async\TasksTest.cs" />
+    <Compile Include="Async\TaskCompletionSourceTest.cs" />
+    <Compile Include="Async\SynchronizationContextExtensionsTest.cs" />
     <Compile Include="Async\ExclusiveSynchronizationContextTest.cs" />
     <Compile Include="Async\OnetimeLockTest.cs" />
-    <Compile Include="Async\TaskExTest.cs" />
+    <Compile Include="Async\TaskExtensionsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>

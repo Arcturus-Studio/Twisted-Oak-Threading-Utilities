@@ -10,7 +10,7 @@ namespace TwistedOak.Util.TaskEx {
             if (context == null) throw new ArgumentNullException("context");
             if (action == null) throw new ArgumentNullException("action");
             var t = new TaskCompletionSource();
-            context.Post(x => t.SetFromCompletedTask(action.ExecuteIntoTask()), null);
+            context.Post(x => t.SetFromCompletedTask(Tasks.FromExecution(action)), null);
             return t.Task;
         }
 
@@ -19,7 +19,7 @@ namespace TwistedOak.Util.TaskEx {
             if (context == null) throw new ArgumentNullException("context");
             if (func == null) throw new ArgumentNullException("func");
             var t = new TaskCompletionSource<T>();
-            context.Post(x => t.SetFromCompletedTask(func.EvalIntoTask()), null);
+            context.Post(x => t.SetFromCompletedTask(Tasks.FromEvaluation(func)), null);
             return t.Task;
         }
         

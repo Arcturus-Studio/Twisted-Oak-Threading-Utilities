@@ -4,55 +4,14 @@ using System.Threading.Tasks;
 
 namespace TwistedOak.Util.TaskEx {
     ///<summary>Contains extension methods related to tasks.</summary>
-    public static class TaskEx {
-        private static readonly Task CachedCompletedTask = Task.FromResult(true);
-        private static readonly Task CachedCancelledTask = CancelledTaskT<bool>();
-
-        ///<summary>A task that has run to completion.</summary>
-        public static Task CompletedTask { get { return CachedCompletedTask; } }
-        ///<summary>A task that has been cancelled.</summary>
-        public static Task CancelledTask { get { return CachedCancelledTask; } }
-        ///<summary>Returns a task that has faulted with the given exception.</summary>
-        public static Task FaultedTask(Exception exception) {
-            var t = new TaskCompletionSource();
-            t.SetException(exception);
-            return t.Task;
-        }
-        ///<summary>Returns a task that has faulted with the given exceptions.</summary>
-        public static Task FaultedTask(IEnumerable<Exception> exceptions) {
-            var t = new TaskCompletionSource();
-            t.SetException(exceptions);
-            return t.Task;
-        }
-
-        ///<summary>Returns a typed task that has been cancelled.</summary>
-        public static Task<T> CancelledTaskT<T>() {
-            var t = new TaskCompletionSource<T>();
-            t.SetCanceled();
-            return t.Task;
-        }
-
-        ///<summary>Returns a typed task that has faulted with the given exception.</summary>
-        public static Task<T> FaultedTaskT<T>(Exception exception) {
-            var t = new TaskCompletionSource<T>();
-            t.SetException(exception);
-            return t.Task;
-        }
-
-        ///<summary>Returns a typed task that has faulted with the given exceptions.</summary>
-        public static Task<T> FaultedTaskT<T>(IEnumerable<Exception> exceptions) {
-            var t = new TaskCompletionSource<T>();
-            t.SetException(exceptions);
-            return t.Task;
-        }
-
+    public static class TaskExtensions {
         ///<summary>Determines if the task has ran to completion, as opposed to being faulted, cancelled, or not yet completed.</summary>
         public static bool IsRanToCompletion(this Task task) {
             if (task == null) throw new ArgumentNullException("task");
             return task.Status == TaskStatus.RanToCompletion;
         }
 
-        ///<summary>Will observe the task's exception, if any, so that it is not considered propagated to the unobserved exception handler.</summary>
+        ///<summary>Will observe (but ignore) the task's exception, if any, so that it is not considered propagated to the unobserved exception handler.</summary>
         public static void ObserveAnyException(this Task task) {
             if (task == null) throw new ArgumentNullException("task");
             task.ContinueWith(t => t.IsFaulted ? t.Exception : null, TaskContinuationOptions.ExecuteSynchronously);

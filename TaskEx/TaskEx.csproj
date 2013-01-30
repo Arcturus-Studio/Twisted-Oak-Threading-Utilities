@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TwistedOak.Util.TaskEx</RootNamespace>
-    <AssemblyName>ElementPortableLibrary</AssemblyName>
+    <AssemblyName>TaskEx</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -34,7 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>bin\Release\ElementPortableLibrary.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\TaskEx.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
@@ -44,6 +44,7 @@
     <Compile Include="Async\AnonymousAwaiter.cs" />
     <Compile Include="Async\AnonymousSynchronizationContext.cs" />
     <Compile Include="Async\AwaitableExtensions.cs" />
+    <Compile Include="Async\Tasks.cs" />
     <Compile Include="Async\TaskCompletionSourceExtensions.cs" />
     <Compile Include="Async\ExclusiveSynchronizationContext.cs" />
     <Compile Include="Async\IAwaitable.cs" />
@@ -51,7 +52,7 @@
     <Compile Include="Async\OnetimeLock.cs" />
     <Compile Include="Async\SynchronizationContextExtensions.cs" />
     <Compile Include="Async\TaskCompletionSource.cs" />
-    <Compile Include="Async\TaskEx.cs" />
+    <Compile Include="Async\TaskExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
