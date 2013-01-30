@@ -44,9 +44,38 @@ public class TaskExtensionsTest {
         Tasks.Cancelled<int>().Select(e => e + 1).AssertCancelled();
         Tasks.Faulted<int>(new ArgumentException()).Select(e => e + 1).AssertFailed<ArgumentException>();
         Task.FromResult(3).Select(e => e + 1).AssertRanToCompletion().AssertEquals(4);
+        (from r in Tasks.RanToCompletion(1) select r + 1).AssertRanToCompletion().AssertEquals(2);
         // wrap inline failure
         Tasks.RanToCompletion(1).Select<int, int>(e => { throw new TaskCanceledException(); }).AssertCancelled();
         Tasks.RanToCompletion(1).Select<int, int>(e => { throw new ArgumentException(); }).AssertFailed<ArgumentException>();
+    }
+    [TestMethod]
+    public void Where() {
+        // void
+        Tasks.Cancelled().Select(() => 1).AssertCancelled();
+        Tasks.Faulted(new ArgumentException()).Select(() => 1).AssertFailed<ArgumentException>();
+        Tasks.RanToCompletion().Select(() => 1).AssertRanToCompletion().AssertEquals(1);
+        // wrap inline failure
+        Tasks.RanToCompletion().Where(() => { throw new TaskCanceledException(); }).AssertCancelled();
+        Tasks.RanToCompletion().Where(() => { throw new ArgumentException(); }).AssertFailed<ArgumentException>();
+
+        // generic
+        Tasks.Cancelled<int>().Where(e => e == 3).AssertCancelled();
+        Tasks.Faulted<int>(new ArgumentException()).Where(e => e == 3).AssertFailed<ArgumentException>();
+        Task.FromResult(3).Where(e => e == 3).AssertRanToCompletion().AssertEquals(3);
+        Task.FromResult(3).Where(e => e == 4).AssertCancelled();
+        (from r in Tasks.RanToCompletion(1) where r == 1 select r + 1).AssertRanToCompletion().AssertEquals(2);
+        // wrap inline failure
+        Tasks.RanToCompletion(1).Where(e => { throw new TaskCanceledException(); }).AssertCancelled();
+        Tasks.RanToCompletion(1).Where(e => { throw new ArgumentException(); }).AssertFailed<ArgumentException>();
+    }
+
+    [TestMethod]
+    public void SelectMany() {
+        (from e in Tasks.RanToCompletion(1) 
+         from e2 in Tasks.RanToCompletion(2) 
+         select e2 + e).AssertRanToCompletion()
+                       .AssertEquals(3);
     }
 
     [TestMethod]

@@ -106,7 +106,7 @@ namespace TwistedOak.Threading {
         ///<summary>
         ///The eventual result of applying a projection to the task's result.
         ///The projection is guaranteed to be evaluated in the same synchronization context as the caller.
-        ///Cancellation and exceptions are propagated.
+        ///Cancellation and exceptions are propagated, without evaluating the projection.
         ///</summary>
         public static async Task<TOut> Select<TIn, TOut>(this Task<TIn> task, Func<TIn, TOut> projection) {
             if (task == null) throw new ArgumentNullException("task");
@@ -114,6 +114,45 @@ namespace TwistedOak.Threading {
             return projection(await task);
         }
 
+        ///<summary>
+        ///The eventual result of applying a series of projections to a task's result.
+        ///The projections are guaranteed to be evaluated in the same synchronization context as the caller.
+        ///Cancellation and exceptions are propagated, without evaluating more projections.
+        ///</summary>
+        public static Task<TOut> SelectMany<TIn, TMid, TOut>(this Task<TIn> task,
+                                                             Func<TIn, Task<TMid>> midProjection,
+                                                             Func<TIn, TMid, TOut> outProjection) {
+            if (task == null) throw new ArgumentNullException("task");
+            if (midProjection == null) throw new ArgumentNullException("midProjection");
+            if (outProjection == null) throw new ArgumentNullException("outProjection");
+            return task.Select(i => midProjection(i).Select(m => outProjection(i, m))).Unwrap();
+        }
+
+        ///<summary>
+        ///The same task, except cancelled if it would have succeeded with a value that didn't match the filter.
+        ///The filter is guaranteed to be evaluated in the same synchronization context as the caller.
+        ///Cancellation and exceptions are propagated, without evaluating the filter.
+        ///</summary>
+        public static async Task Where(this Task task, Func<bool> filter) {
+            if (task == null) throw new ArgumentNullException("task");
+            if (filter == null) throw new ArgumentNullException("filter");
+            await task;
+            if (!filter()) throw new TaskCanceledException();
+        }
+
+        ///<summary>
+        ///The same task, except cancelled if it would have succeeded with a value that didn't match the filter.
+        ///The filter is guaranteed to be evaluated in the same synchronization context as the caller.
+        ///Cancellation and exceptions are propagated, without evaluating the filter.
+        ///</summary>
+        public static async Task<T> Where<T>(this Task<T> task, Func<T, bool> filter) {
+            if (task == null) throw new ArgumentNullException("task");
+            if (filter == null) throw new ArgumentNullException("filter");
+            var r = await task;
+            if (!filter(r)) throw new TaskCanceledException();
+            return r;
+        }
+        
         ///<summary>
         ///Replaces a task's eventual cancellation with the result of evaluating a function.
         ///If the task runs to completion or faults, then the result is propagated without evaluating the function.
