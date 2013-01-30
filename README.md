@@ -16,4 +16,4 @@ Contains a variety of utility classes and methods:
 
 A code map of the library:
 
-![code map of library](http://i.imgur.com/fZh2cB2.png)
+![code map of library](http://i.imgur.com/XKOnu7q.png)
