@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwistedOak.Util.TaskEx;
-using TwistedOak.Element.Util;
 
 [TestClass]
 public class OnetimeLockTest {

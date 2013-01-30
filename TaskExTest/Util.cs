@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TwistedOak.Element.Util;
 using TwistedOak.Util.TaskEx;
 using System.Threading;
 using System.Linq;
@@ -21,6 +20,10 @@ internal static class Util {
     [DebuggerStepThrough]
     public static void AssertEquals<T>(this T v1, T v2) {
         Assert.AreEqual(actual: v1, expected: v2);
+    }
+    [DebuggerStepThrough]
+    public static void AssertDoesNotEqual<T>(this T v1, T v2) {
+        Assert.AreNotEqual(actual: v1, notExpected: v2);
     }
     [DebuggerStepThrough]
     public static void AssertSequenceEquals<T>(this IEnumerable<T> actual, IEnumerable<T> expected) {

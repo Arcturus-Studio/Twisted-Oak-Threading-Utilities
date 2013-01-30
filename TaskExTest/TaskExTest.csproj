@@ -55,6 +55,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Async\AwaitTypesTest.cs" />
+    <Compile Include="Async\AnonymousAwaitTest.cs" />
+    <Compile Include="Async\AnonymousSynchronizationContextTest.cs" />
     <Compile Include="Async\ExclusiveSynchronizationContextTest.cs" />
     <Compile Include="Async\OnetimeLockTest.cs" />
     <Compile Include="Async\TaskExTest.cs" />

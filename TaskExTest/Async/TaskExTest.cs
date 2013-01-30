@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwistedOak.Util.TaskEx;
-using TwistedOak.Element.Util;
 
 [TestClass]
 public class TaskExTest {
