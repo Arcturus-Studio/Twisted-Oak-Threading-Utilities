@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TwistedOak.Element.Util;
 
 namespace TwistedOak.Util.TaskEx {
     ///<summary>Contains extension methods for manipulating task completion sources.</summary>
@@ -48,7 +47,7 @@ namespace TwistedOak.Util.TaskEx {
                 source.SetRanToCompletion();
                 break;
             case TaskStatus.Faulted:
-                source.SetException(task.Exception.Collapse());
+                source.SetException(task.Exception.InnerExceptions);
                 break;
             case TaskStatus.Canceled:
                 source.SetCanceled();
@@ -69,7 +68,7 @@ namespace TwistedOak.Util.TaskEx {
                 source.SetResult(task.Result);
                 break;
             case TaskStatus.Faulted:
-                source.SetException(task.Exception.Collapse());
+                source.SetException(task.Exception.InnerExceptions);
                 break;
             case TaskStatus.Canceled:
                 source.SetCanceled();
@@ -89,7 +88,7 @@ namespace TwistedOak.Util.TaskEx {
             case TaskStatus.RanToCompletion:
                 return source.TrySetRanToCompletion();
             case TaskStatus.Faulted:
-                return source.TrySetException(task.Exception.Collapse());
+                return source.TrySetException(task.Exception.InnerExceptions);
             case TaskStatus.Canceled:
                 return source.TrySetCanceled();
             default:
@@ -107,7 +106,7 @@ namespace TwistedOak.Util.TaskEx {
             case TaskStatus.RanToCompletion:
                 return source.TrySetResult(task.Result);
             case TaskStatus.Faulted:
-                return source.TrySetException(task.Exception.Collapse());
+                return source.TrySetException(task.Exception.InnerExceptions);
             case TaskStatus.Canceled:
                 return source.TrySetCanceled();
             default:

@@ -83,8 +83,10 @@ internal static class Util {
         } catch (TExpectedException ex) {
             return ex;
         } catch (AggregateException e) {
-            var ex = e.Collapse();
-            if (ex is TExpectedException) return (TExpectedException)ex;
+            if (e.InnerExceptions.Count == 1) {
+                var ex = e.InnerExceptions[0];
+                if (ex is TExpectedException) return (TExpectedException)ex;
+            }
             throw;
         }
     }

@@ -26,12 +26,12 @@ public class TaskExTest {
 
     [TestMethod]
     public void WithFaultyCancellation() {
-        TaskEx.CompletedTask.WithFaultyCancellation().AssertRanToCompletion();
-        Task.FromResult(1).WithFaultyCancellation().AssertRanToCompletion();
-        TaskEx.CancelledTask.WithFaultyCancellation().AssertFailed<TaskCanceledException>();
-        TaskEx.CancelledTaskT<int>().WithFaultyCancellation().AssertFailed<TaskCanceledException>();
-        TaskEx.FaultedTask(new ArgumentOutOfRangeException()).WithFaultyCancellation().AssertFailed<ArgumentOutOfRangeException>();
-        TaskEx.FaultedTaskT<int>(new ArgumentOutOfRangeException()).WithFaultyCancellation().AssertFailed<ArgumentOutOfRangeException>();
+        TaskEx.CompletedTask.WithCancellationToTaskCanceledException().AssertRanToCompletion();
+        Task.FromResult(1).WithCancellationToTaskCanceledException().AssertRanToCompletion();
+        TaskEx.CancelledTask.WithCancellationToTaskCanceledException().AssertFailed<TaskCanceledException>();
+        TaskEx.CancelledTaskT<int>().WithCancellationToTaskCanceledException().AssertFailed<TaskCanceledException>();
+        TaskEx.FaultedTask(new ArgumentOutOfRangeException()).WithCancellationToTaskCanceledException().AssertFailed<ArgumentOutOfRangeException>();
+        TaskEx.FaultedTaskT<int>(new ArgumentOutOfRangeException()).WithCancellationToTaskCanceledException().AssertFailed<ArgumentOutOfRangeException>();
     }
 
     [TestMethod]
@@ -60,18 +60,18 @@ public class TaskExTest {
     }
     [TestMethod]
     public void EvalIntoTask() {
-        var t1 = TaskEx.EvalIntoTask(() => 1);
-        var t2 = TaskEx.EvalIntoTask<int>(() => { throw new TaskCanceledException(); });
-        var t3 = TaskEx.EvalIntoTask<int>(() => { throw new InvalidOperationException(); });
+        var t1 = TaskCompletionSourceExtensions.EvalIntoTask(() => 1);
+        var t2 = TaskCompletionSourceExtensions.EvalIntoTask<int>(() => { throw new TaskCanceledException(); });
+        var t3 = TaskCompletionSourceExtensions.EvalIntoTask<int>(() => { throw new InvalidOperationException(); });
         Assert.IsTrue(t1.IsRanToCompletion() && t1.Result == 1);
         Assert.IsTrue(t2.IsCanceled);
         Assert.IsTrue(t3.IsFaulted && t3.Exception.InnerExceptions.Single() is InvalidOperationException);
     }
     [TestMethod]
     public void ExecuteIntoTask() {
-        var t1 = TaskEx.ExecuteIntoTask(() => { });
-        var t2 = TaskEx.ExecuteIntoTask(() => { throw new TaskCanceledException(); });
-        var t3 = TaskEx.ExecuteIntoTask(() => { throw new InvalidOperationException(); });
+        var t1 = TaskCompletionSourceExtensions.ExecuteIntoTask(() => { });
+        var t2 = TaskCompletionSourceExtensions.ExecuteIntoTask(() => { throw new TaskCanceledException(); });
+        var t3 = TaskCompletionSourceExtensions.ExecuteIntoTask(() => { throw new InvalidOperationException(); });
         Assert.IsTrue(t1.IsRanToCompletion());
         Assert.IsTrue(t2.IsCanceled);
         Assert.IsTrue(t3.IsFaulted && t3.Exception.InnerExceptions.Single() is InvalidOperationException);
@@ -227,39 +227,26 @@ public class TaskExTest {
 
     [TestMethod]
     public void ProjectCancelled() {
-        Assert.IsTrue(Task.FromResult(3).ProjectCancelled(() => 4).AssertRanToCompletion() == 3);
-        Assert.IsTrue(TaskEx.CancelledTaskT<int>().ProjectCancelled(() => 4).AssertRanToCompletion() == 4);
-        TaskEx.FaultedTaskT<int>(new ArgumentException()).ProjectCancelled(() => 1).AssertFailed<ArgumentException>();
+        Assert.IsTrue(Task.FromResult(3).SelectCancelled(() => 4).AssertRanToCompletion() == 3);
+        Assert.IsTrue(TaskEx.CancelledTaskT<int>().SelectCancelled(() => 4).AssertRanToCompletion() == 4);
+        TaskEx.FaultedTaskT<int>(new ArgumentException()).SelectCancelled(() => 1).AssertFailed<ArgumentException>();
 
-        Assert.IsTrue(Task.FromResult(3).ProjectCancelled<int>(() => { throw new ArgumentException(); }).AssertRanToCompletion() == 3);
-        TaskEx.CancelledTaskT<int>().ProjectCancelled<int>(() => { throw new ArgumentException(); }).AssertFailed<ArgumentException>();
-        TaskEx.CancelledTaskT<int>().ProjectCancelled<int>(() => { throw new TaskCanceledException(); }).AssertCancelled();
-        TaskEx.FaultedTaskT<int>(new ArithmeticException()).ProjectCancelled<int>(() => { throw new ArgumentException(); }).AssertFailed<ArithmeticException>();
+        Assert.IsTrue(Task.FromResult(3).SelectCancelled(() => { throw new ArgumentException(); }).AssertRanToCompletion() == 3);
+        TaskEx.CancelledTaskT<int>().SelectCancelled<int>(() => { throw new ArgumentException(); }).AssertFailed<ArgumentException>();
+        TaskEx.CancelledTaskT<int>().SelectCancelled<int>(() => { throw new TaskCanceledException(); }).AssertCancelled();
+        TaskEx.FaultedTaskT<int>(new ArithmeticException()).SelectCancelled<int>(() => { throw new ArgumentException(); }).AssertFailed<ArithmeticException>();
     }
 
     [TestMethod]
     public void ProjectFaulted() {
-        Assert.IsTrue(Task.FromResult(3).ProjectFaulted<int, ArgumentException>(e => 4).AssertRanToCompletion() == 3);
-        TaskEx.CancelledTaskT<int>().ProjectFaulted<int, ArgumentException>(ex => 4).AssertCancelled();
-        Assert.IsTrue(TaskEx.FaultedTaskT<int>(new ArgumentException()).ProjectFaulted<int, ArgumentException>(ex => 1).AssertRanToCompletion() == 1);
+        Assert.IsTrue(Task.FromResult(3).SelectFaulted<int, ArgumentException>(e => 4).AssertRanToCompletion() == 3);
+        TaskEx.CancelledTaskT<int>().SelectFaulted<int, ArgumentException>(ex => 4).AssertCancelled();
+        Assert.IsTrue(TaskEx.FaultedTaskT<int>(new ArgumentException()).SelectFaulted<int, ArgumentException>(ex => 1).AssertRanToCompletion() == 1);
 
-        Assert.IsTrue(Task.FromResult(3).ProjectFaulted<int, ArgumentException>(ex => { throw new ArgumentException(); }).AssertRanToCompletion() == 3);
-        TaskEx.CancelledTaskT<int>().ProjectFaulted<int, ArgumentException>(ex => { throw new ArithmeticException(); }).AssertCancelled();
-        TaskEx.FaultedTaskT<int>(new InvalidOperationException()).ProjectFaulted<int, ArgumentException>(ex => { throw new ArithmeticException(); }).AssertFailed<InvalidOperationException>();
-        TaskEx.FaultedTaskT<int>(new ArgumentException()).ProjectFaulted<int, ArgumentException>(ex => { throw new ArithmeticException(); }).AssertFailed<ArithmeticException>();
-    }
-
-    [TestMethod]
-    public void CompletionNotCancelled() {
-        Assert.IsTrue(TaskEx.CompletedTask.CompletionNotCancelledAsync().AssertRanToCompletion() == true);
-        Assert.IsTrue(TaskEx.CancelledTask.CompletionNotCancelledAsync().AssertRanToCompletion() == false);
-        TaskEx.FaultedTask(new ArgumentException()).CompletionNotCancelledAsync().AssertFailed<ArgumentException>();
-        
-        var tx = new TaskCompletionSource<int>();
-        var ty = tx.Task.CompletionNotCancelledAsync();
-        ty.AssertNotCompleted();
-        tx.SetCanceled();
-        Assert.IsTrue(ty.AssertRanToCompletion() == false);
+        Assert.IsTrue(Task.FromResult(3).SelectFaulted<int, ArgumentException>(ex => { throw new ArgumentException(); }).AssertRanToCompletion() == 3);
+        TaskEx.CancelledTaskT<int>().SelectFaulted<int, ArgumentException>(ex => { throw new ArithmeticException(); }).AssertCancelled();
+        TaskEx.FaultedTaskT<int>(new InvalidOperationException()).SelectFaulted<int, ArgumentException>(ex => { throw new ArithmeticException(); }).AssertFailed<InvalidOperationException>();
+        TaskEx.FaultedTaskT<int>(new ArgumentException()).SelectFaulted<int, ArgumentException>(ex => { throw new ArithmeticException(); }).AssertFailed<ArithmeticException>();
     }
 
     [TestMethod]
@@ -285,14 +272,6 @@ public class TaskExTest {
         tz.AssertRanToCompletion().AssertCancelled();
     }
 
-    [TestMethod]
-    public void IgnoreCancelled() {
-        TaskEx.CompletedTask.IgnoreCancelled().AssertRanToCompletion();
-        TaskEx.CancelledTask.IgnoreCancelled().AssertRanToCompletion();
-        TaskEx.CancelledTaskT<int>().IgnoreCancelled().AssertRanToCompletion();
-        TaskEx.FaultedTask(new ArgumentException()).IgnoreCancelled().AssertFailed<ArgumentException>();
-        TaskEx.FaultedTaskT<int>(new ArgumentException()).IgnoreCancelled().AssertFailed<ArgumentException>();
-    }
     [TestMethod]
     public void PostAction() {
         var c = new SynchronizationContext();

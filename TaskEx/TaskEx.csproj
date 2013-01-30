@@ -41,13 +41,15 @@
     <Compile Include="Async\AnonymousAwaitable.cs" />
     <Compile Include="Async\AnonymousAwaiter.cs" />
     <Compile Include="Async\AnonymousSynchronizationContext.cs" />
+    <Compile Include="Async\AwaitableExtensions.cs" />
+    <Compile Include="Async\TaskCompletionSourceExtensions.cs" />
     <Compile Include="Async\ExclusiveSynchronizationContext.cs" />
     <Compile Include="Async\IAwaitable.cs" />
     <Compile Include="Async\IAwaiter.cs" />
     <Compile Include="Async\OnetimeLock.cs" />
+    <Compile Include="Async\SynchronizationContextExtensions.cs" />
     <Compile Include="Async\TaskCompletionSource.cs" />
     <Compile Include="Async\TaskEx.cs" />
-    <Compile Include="Util\InternalUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
