@@ -29,6 +29,7 @@ namespace TwistedOak.Util.TaskEx {
         ///<summary>Attempts to transtion the underlying task into the ran-to-completion state.</summary>
         public bool TrySetRanToCompletion() { return _source.TrySetResult(true); }
         
+        ///<summary>Returns a string that represents the task completion source.</summary>
         public override string ToString() { return _source.ToString(); }
     }
 }

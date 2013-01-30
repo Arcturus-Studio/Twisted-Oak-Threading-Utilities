@@ -15,6 +15,7 @@ namespace TwistedOak.Util.TaskEx {
             this._subContext = subContext ?? new SynchronizationContext();
         }
 
+        ///<summary>Dispatches an asynchronous message to the exclusive synchronization context.</summary>
         public override void Post(SendOrPostCallback d, object state) {
             if (d == null) throw new ArgumentNullException("d");
             _pending.Enqueue(() => d(state));
@@ -39,9 +40,11 @@ namespace TwistedOak.Util.TaskEx {
                 SetSynchronizationContext(surroundingContext); // restore surrounding sync context
             }
         }
+        ///<summary>Not supported.</summary>
         public override void Send(SendOrPostCallback d, object state) {
             throw new NotSupportedException();
         }
+        ///<summary>Returns the exclusive synchronization context, unchanged.</summary>
         public override SynchronizationContext CreateCopy() {
             return this;
         }
